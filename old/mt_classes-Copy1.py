@@ -27,14 +27,6 @@ class Obj_base():
     
     def __repr__(self):
         return type(self).__name__
-    
-class Unknown(Obj_base):
-    text = None
-    def __init__(self,pos,text):
-        super().__init__(pos)
-        self.text = text
-        self.valid = True
-    
 
 class Symbol(Obj_base):
     sym = None
@@ -174,18 +166,6 @@ class Action_shorted(Obj_base):
             return "shorted"
         else:
             return "invalid shorted"
-        
-class LotQuantity(Obj_base):
-    quantity = None
-    def __init__(self,pos,text1,text2):
-        super().__init__(pos)
-        if text2.lower().startswith('lot'):
-            self.quantity = text1
-            self.valid = True
-            
-    def __repr__(self):
-        return "LotQuantity({})".format(self.quantity)
-            
 
         
 class Month(Obj_base):

@@ -24,106 +24,109 @@ def det_period(pos,text): period = Period(pos,text);return period.valid
 def det_midpoint(pos,text): mp = MidPoint(pos,text);return mp.valid
     
     
-def create_tokens(timestamp,tokens):
+def create_tokens(timestamp,text):
     
     
 #    print('create_tokens:',text)
 
+    obs = []
+    
+    
+    text_split = text.split()
     
     last = None
 
-    for i,w in enumerate(tokens):
-        
-        if type(w) != Unknown:
-            continue
+    for i,w in enumerate(text_split):
         
         
         if i:
-            last = tokens[i-1]
+            last = text_split[i-1]
                 
-        if w.text.startswith('ADJ'):
-            tokens[i] = Adj(i,w.text)
+        if w.startswith('ADJ'):
+            obs.append(Adj(i,w))
             continue
             
-        if det_symbol(i,w.text):
-            tokens[i] = Symbol(i,w.text)
+        if det_symbol(i,w):
+            obs.append(Symbol(i,w))
             continue
             
-        if det_date_event(i,w.text):
-            tokens[i] = Month_slash_day(i,w.text)
+        if det_date_event(i,w):
+            obs.append(Month_slash_day(i,w))
             continue
             
-        if det_shorting(i,w.text):
-            tokens[i] = Action_shorting(i,w.text)
+        if det_shorting(i,w):
+            obs.append(Action_shorting(i,w))
             continue
             
-        if det_shorted(i,w.text):
-            tokens[i] = Action_shorted(i,w.text)
+        if det_shorted(i,w):
+            obs.append(Action_shorted(i,w))
             continue
 
-        if det_month(i,w.text):
-            tokens[i] = Month(i,w.text)
+        if det_month(i,w):
+            obs.append(Month(i,w))
             continue
             
-        #if det_strike_day(i,w,timestamp,last):
-        #    obs.append(Strike_day(i,w,timestamp,last))
-        #    continue
-            
-        #if det_strike_date(i,w,timestamp,last):
-        #    obs.append(Strike_date(i,w,timestamp,last))
-        #    continue
-            
-        if det_strikes(i,w.text):
-            tokens[i] = Strikes(i,w.text)
+        if det_strike_day(i,w,timestamp,last):
+            obs.append(Strike_day(i,w,timestamp,last))
             continue
             
-        if det_spread_type(i,w.text):
-            #print("create_tokens: detected spread type:",w.text)
-            tokens[i] = Spread_type(i,w.text)
+        if det_strike_date(i,w,timestamp,last):
+            obs.append(Strike_date(i,w,timestamp,last))
             continue
             
-        if det_stop(i,w.text):
-            tokens[i]= Stop(i,w.text)
+        if det_strikes(i,w):
+            obs.append(Strikes(i,w))
             continue
             
-        if det_close(i,w.text):
-            tokens[i] = Close(i,w.text)
+        if det_spread_type(i,w):
+            print("create_tokens: detected spread type:",w)
+            obs.append(Spread_type(i,w))
             continue
             
-        if det_period(i,w.text):
-            tokens[i] = Period(i,w.text)
+        if det_stop(i,w):
+            obs.append(Stop(i,w))
             continue
             
-        if det_price_per_share(i,w.text):
-            tokens[i] = Price_per_share(i,w.text)
+        if det_close(i,w):
+            obs.append(Close(i,w))
+            continue
+            
+        if det_period(i,w):
+            print("appending")
+            obs.append(Period(i,w))
             continue
 
-        if det_price(i,w.text):
-            tokens[i] = Price(i,w.text)
-            continue
             
-        if det_condition(i,w.text):
-            tokens[i] = Condition(i,w.text)
-            continue
-            
-        if det_watch(i,w.text):
-            tokens[i] = Watch(i,w.text)
-            continue
-            
-        if det_cover(i,w.text):
-            tokens[i] = Cover(i,w.text)
-            continue
-            
-        if det_premium(i,w.text):
-            tokens[i] = Premium(i,w.text)
+        if det_price_per_share(i,w):
+            obs.append(Price_per_share(i,w))
             continue
 
-        if det_condor(i,w.text):
-            tokens[i] = Condor(i,w.text)
+        if det_price(i,w):
+            obs.append(Price(i,w))
             continue
             
-        if det_midpoint(i,w.text):
-            tokens[i] = MidPoint(i,w.text)
+        if det_condition(i,w):
+            obs.append(Condition(i,w))
             continue
             
-    return tokens
+        if det_watch(i,w):
+            obs.append(Watch(i,w))
+            continue
+            
+        if det_cover(i,w):
+            obs.append(Cover(i,w))
+            continue
+            
+        if det_premium(i,w):
+            obs.append(Premium(i,w))
+            continue
+
+        if det_condor(i,w):
+            obs.append(Condor(i,w))
+            continue
+            
+        if det_midpoint(i,w):
+            obs.append(MidPoint(i,w))
+            continue
+            
+    return obs
