@@ -5,6 +5,8 @@ from IPython.display import display, Markdown, Latex
 import itertools
 
 
+class new_class():
+    pass
 
 class Obj_base():
     valid = False
@@ -353,9 +355,20 @@ class Spread_type(Obj_base):
         if self.put is False: return 'CALL'
         return 'None'
             
-    
+class Number(Obj_base):
+    number = None
+    def __init__(self,pos,text):
+        super().__init__(pos)
+        try:
+            self.number = float(text)
+            self.valid = True
+        except:
+            pass
+    def __repr__(self):
+        return 'N({})'.format(self.number)
             
 class Price(Obj_base):
+
     price = None
     def __init__(self,pos,text):
         super().__init__(pos)
@@ -378,7 +391,7 @@ class Price(Obj_base):
     def __repr__(self):
         if self.price is not None:
             #return '$' + str(self.price)
-            return 'Price'
+            return 'P({0})'.format(self.price)
         return '$None'
         
 class Price_per_share(Obj_base):
@@ -450,6 +463,7 @@ class Condition(Obj_base):
     over = None
     def __init__(self,pos,text):
         super().__init__(pos)
+        self.price = None
 
         if text.lower() == 'over':
             self.over = True
@@ -457,6 +471,10 @@ class Condition(Obj_base):
             self.over = False
             
         self.valid = (self.over != None)
+        
+    def __repr__(self):
+        
+        return 'Condition({},{})'.format('over' if self.over else 'under',self.price)
                     
 
             

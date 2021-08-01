@@ -35,6 +35,7 @@ def mt_dict_to_df(dct_array):
             df_time.insert(loc=0,column = 'time', value = time_vals)
             
             df = pd.concat([df,df_time])
+            df.reset_index(drop = True, inplace = True)
             
             continue
             
@@ -50,6 +51,8 @@ def mt_dict_to_df(dct_array):
             df_fragment.insert(loc=0,column = k,value = var_vals)
             
             df = pd.concat([df,df_fragment])
+            df.reset_index(drop = True, inplace = True)
+
             
     return df
 
@@ -117,3 +120,17 @@ def movecol(df, cols_to_move=[], ref_col='', place='After'):
     seg3 = [i for i in cols if i not in seg1 + seg2]
     
     return(df[seg1 + seg2 + seg3])
+
+def concat_dfs(df1,df2):
+    
+    if not len(df1):
+        return df2
+    
+    if not len(df2):
+        return df1
+                        
+    df3 = pd.concat([df1,df2]).drop_duplicates()
+    
+    
+    return df3
+

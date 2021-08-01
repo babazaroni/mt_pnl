@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- saved from url=(0031)https://msg.smbtradealerts.com/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>SMB Options Alert</title>
+    <link rel="stylesheet" href="./bootstrap.min.css">
+
+    <style>
+      .jumbotron {
+        margin: 10px;
+      }
+      h3 {
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body onload="onload()">
+  <div class="d-flex h-100 align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div id="display" class="jumbotron">
+          <h3 class="d-flex justify-content-center">SMB Options Alert</h3>
+          <h5 class="d-flex justify-content-center">April 09, 2021</h5>
+          <br>
+            
+          <span><i>9:15 AM</i></span>
+            <div class="alert alert-dismissible alert-warning" onclick="toggleRead(this)">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <strong>There is a 75% chance of a bullish signal this morning. Please be prepared to enter a put credit spread trade.</strong>
+            </div><span><i>9:30 AM</i></span>
+            <div class="alert alert-dismissible alert-warning" onclick="toggleRead(this)">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <strong>The Adaptive IQ signal is suggesting a bullish trade this morning: an $SPX index put credit spread trade, expiring today, with a short strike of 4090</strong>
+            </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  var ws;
+  var heartbeat_interval = null;
+  var user_name = 'smbalert';
+
+  setup();
+
+  function setup() {
+      ws = new WebSocket('wss://msg.smbtradealerts.com/smbalerts');
+      //console.log('wss://msg.smbtradealerts.com/smbalerts');
+
+      ws.onmessage = function (event) {
+          var data = JSON.parse(event.data);
+          if (! data.msg) {
+              return;
+          }
+          //console.log('Received', data.msg);
+          let ts = prettyDate2();
+          document.getElementById("display").innerHTML += 
+            `<span><i>${ts}</i></span>
+            <div class="alert alert-dismissible alert-warning" onclick="toggleRead(this)">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <strong>${data.msg}</strong>
+            </div>`;
+
+          if (document.contains(document.getElementById("nodata"))) {
+            document.getElementById("nodata").remove();
+          }  
+      };
+
+      ws.onopen = function (event) {
+          ws.send(JSON.stringify({login: user_name}));
+
+          if (heartbeat_interval === null) {
+              heartbeat_interval = setInterval(function() {
+                  ws.send(JSON.stringify({heartbeat: user_name}));
+              }, 60000);
+          }
+      };
+
+      ws.onclose = function(){
+          if (heartbeat_interval !== null) {
+              clearInterval(heartbeat_interval);
+          }
+          console.log("websocket closed, attempt restart in 10s");
+          setTimeout(setup, 10000);
+      };
+
+      ws.onerror = function(err) {
+          console.error('Socket encountered error: ', err.message, 'Closing socket');
+          ws.close();
+      };
+  };
+  function onload() {
+      console.log('onload');
+  }
+
+  function prettyDate2(){
+    var date = new Date();
+    var localeSpecificTime = date.toLocaleTimeString("en-US", { timeZone: 'America/New_York' });
+    return localeSpecificTime.replace(/:\d+ /, ' ');
+  }
+
+  function toggleRead(element) {
+    element.classList.remove('alert-warning');
+    element.classList.add('alert-success');
+    return;
+  }
+  </script>
+  
+
+</body></html>
